@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"strings"
 
@@ -88,7 +87,7 @@ func main() {
 			log.Panicf("could not hash cert for domain %s: %s\n", domainName, err)
 		}
 
-		oldCertFileHash, err := internal.HashFile(&conf, fmt.Sprintf("%s-cert.pem", domainName))
+		oldCertFileHash, err := internal.HashFile(&conf, domainName, true)
 		if err != nil {
 			log.Panicf("could not hash existing cert file for domain %s: %s\n", domainName, err)
 		}

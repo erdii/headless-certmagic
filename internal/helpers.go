@@ -17,14 +17,29 @@ import (
 	"github.com/mholt/certmagic"
 )
 
-func getFullPath(conf *Config, fileName string) string {
-	sanitizedFileName := strings.Replace(fileName, "*", "_", 1)
-	return path.Join(conf.Path, sanitizedFileName)
+func getFullPath(conf *Config, domainName string, isCert bool) string {
+	var env string
+	if conf.Staging {
+		env = "stage"
+	} else {
+		env = "prod"
+	}
+
+	var filetype string
+	if isCert {
+		filetype = "cert"
+	} else {
+		filetype = "key"
+	}
+
+	sanitizedDomainName := strings.Replace(domainName, "*", "_", 1)
+	fileName := fmt.Sprintf("%s-%s-%s.pem", sanitizedDomainName, filetype, env)
+	return path.Join(conf.Path, fileName)
 }
 
 // ExportCertificateFile saves certs to file
 func ExportCertificateFile(conf *Config, domainName string, cert *certmagic.Certificate) error {
-	certFileName := getFullPath(conf, fmt.Sprintf("%s-cert.pem", domainName))
+	certFileName := getFullPath(conf, domainName, true)
 	log.Printf("saving certs: %s\n", certFileName)
 
 	f, err := os.OpenFile(certFileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
@@ -47,7 +62,7 @@ func ExportCertificateFile(conf *Config, domainName string, cert *certmagic.Cert
 
 // ExportKeyFile saves a private key to file
 func ExportKeyFile(conf *Config, domainName string, cert *certmagic.Certificate) error {
-	keyFileName := getFullPath(conf, fmt.Sprintf("%s-key.pem", domainName))
+	keyFileName := getFullPath(conf, domainName, false)
 	log.Printf("saving key: %s\n", keyFileName)
 
 	f, err := os.OpenFile(keyFileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
@@ -103,14 +118,14 @@ func ExecCmd(command string) error {
 }
 
 // HashFile blabla
-func HashFile(conf *Config, filename string) (string, error) {
-	f, err := os.Open(getFullPath(conf, filename))
+func HashFile(conf *Config, domainName string, isCert bool) (string, error) {
+	f, err := os.Open(getFullPath(conf, domainName, isCert))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return "", nil
-		} else {
-			return "", err
 		}
+
+		return "", err
 	}
 	defer f.Close()
 
