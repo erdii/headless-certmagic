@@ -17,6 +17,7 @@ func main() {
 
 	flagDomains := flag.String("domains", "", "comma-separated list of domains")
 	flagStaging := flag.Bool("staging", true, "use LE staging environment")
+	flagForceRenewal := flag.Bool("force-renewal", false, "force certificate renewal")
 	flagEmail := flag.String("email", "", "email for LE account")
 	flagBucketName := flag.String("bucket-name", "", "s3 bucket for storage/locking")
 	flagBucketRegion := flag.String("bucket-region", "", "s3 bucket region")
@@ -34,6 +35,7 @@ func main() {
 		DomainNames:  strings.Split(*flagDomains, ","),
 		Path:         *flagOutPath,
 		Staging:      *flagStaging,
+		ForceRenewal: *flagForceRenewal,
 		Email:        *flagEmail,
 		BucketName:   *flagBucketName,
 		BucketRegion: *flagBucketRegion,
@@ -47,6 +49,10 @@ func main() {
 	certmagic.Default.Agreed = true
 	certmagic.Default.MustStaple = true
 	certmagic.Default.Email = conf.Email
+
+	if conf.ForceRenewal {
+		certmagic.Default.RenewDurationBefore = 999999999999999999
+	}
 
 	if conf.Staging {
 		certmagic.Default.CA = certmagic.LetsEncryptStagingCA

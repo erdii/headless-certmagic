@@ -13,6 +13,7 @@ but leverage certmagic's storage backends to provision certificates on fleets of
 * storage provider support:
 	* s3 ([securityclippy/magicstorage](https://github.com/securityclippy/magicstorage)): supply aws credentials like usual (envvars, ~/.aws, ...)
 	* uses [mholt/certmagic](https://github.com/mholt/certmagic) and its storage backends
+* forced certificate renewal
 
 ### Requirements (for now)
 * private s3 bucket

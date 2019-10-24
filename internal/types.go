@@ -5,6 +5,7 @@ type Config struct {
 	DomainNames  []string
 	Path         string
 	Staging      bool
+	ForceRenewal bool
 	Email        string
 	BucketName   string
 	BucketRegion string
